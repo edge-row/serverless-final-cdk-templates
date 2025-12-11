@@ -77,9 +77,12 @@ export class EdroFinalPart2 extends cdk.Stack {
     });
 
     // 7. Deploy the Website Content to S3
-    // Assumes 'website-assets' folder exists in your project root with index.html
+    // Deploy static assets + dynamically generated config.js with API URL
     new s3deploy.BucketDeployment(this, 'WebsiteDeploy', {
-      sources: [s3deploy.Source.asset(path.join(__dirname, '..', 'website-assets'))],
+      sources: [
+        s3deploy.Source.asset(path.join(__dirname, '..', 'website-assets')),
+        s3deploy.Source.data('config.js', `window.API_URL = "${httpApi.url}";`),
+      ],
       destinationBucket: websiteBucket,
     });
 
