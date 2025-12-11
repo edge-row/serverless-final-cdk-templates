@@ -5,14 +5,10 @@ import { FinalStackPart2 } from '../lib/final-stack-part-2'; // <-- NEW
 
 const app = new cdk.App();
 
-// Stack 1: Simple API Gateway -> Lambda (Messaging)
-new FinalStackPart1(app, 'FinalStackPart1', {
-  // Use a fixed environment to ensure the deployment works smoothly
-  // env: { account: '123456789012', region: 'us-east-1' },
-});
+const env = {
+  account: process.env.CDK_DEFAULT_ACCOUNT,
+  region: process.env.CDK_DEFAULT_REGION,
+}
 
-// Stack 2: API Gateway -> Lambda -> DynamoDB (CRUD)
-new FinalStackPart2(app, 'FinalStackPart2', { // <-- NEW
-  // Use a fixed environment to ensure the deployment works smoothly
-  // env: { account: '123456789012', region: 'us-east-1' },
-});
+new FinalStackPart1(app, 'FinalStackPart1', { env });
+new FinalStackPart2(app, 'FinalStackPart2', { env });

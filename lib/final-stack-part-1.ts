@@ -3,24 +3,16 @@ import { Construct } from 'constructs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigw from 'aws-cdk-lib/aws-apigatewayv2';
 import * as integrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
+import * as path from 'path';
 
 export class FinalStackPart1 extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
     const messageLambda = new lambda.Function(this, 'MessageLambda', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromInline(`
-        exports.handler = async (event) => {
-          console.log('Event: ', event);
-          return {
-            statusCode: 200,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "Hello from the FinalStackPart1 API!" }),
-          };
-        };
-      `),
+      runtime: lambda.Runtime.PYTHON_3_12,
+      handler: 'handler.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, 'lambdas/part1')),
     });
 
     // 2. Define the API Gateway (HTTP API - simpler than REST API)
@@ -36,7 +28,7 @@ export class FinalStackPart1 extends cdk.Stack {
     );
 
     httpApi.addRoutes({
-      path: '/hello',
+      path: '/{message}',
       methods: [apigw.HttpMethod.GET],
       integration: lambdaIntegration,
     });
