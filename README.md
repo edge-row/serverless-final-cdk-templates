@@ -34,15 +34,21 @@ Run these commands from the root directory of your project:
 ```bash
 # Install Node.js dependencies (TypeScript, CDK library)
 npm install
-
-# Install Python dependencies for the Lambdas (e.g., Boto3 in the Part 2 folder)
-# This step assumes your Lambda code lives in the specific subdirectories:
-cd lib/lambdas/part2
-npm install
-cd ../../../
 ```
 
-### 3. AWS CDK Bootstrap (Initial Setup)
+### 3. Prepare Static Website Assets
+
+Stack **FinalStackPart2** deploys a static website client. You must create the asset folder and place your HTML/JS files inside it.
+
+```bash
+# Create the asset directory
+mkdir website-assets
+
+# Place your index.html and client-side code inside website-assets/
+# Ensure your client code uses the API Base URL output by the CDK.
+```
+
+### 4. AWS CDK Bootstrap (Initial Setup)
 
 The first time you deploy to a new AWS account/region, you must _bootstrap_ it. This creates the necessary S3 bucket and IAM roles the CDK uses for deployment.
 
@@ -60,7 +66,7 @@ npx cdk bootstrap aws://${CDK_DEFAULT_ACCOUNT}/${CDK_DEFAULT_REGION}
 The project contains two stacks:
 
 - **FinalStackPart1**: Simple API Gateway + Lambda for a message response.
-- **FinalStackPart2**: API Gateway + Python Lambda + DynamoDB for basic CRUD operations.
+- **FinalStackPart2**: API Gateway + Python Lambda + DynamoDB for basic CRUD operations, **plus S3 Static Website Hosting**.
 
 ### Useful commands
 
@@ -86,11 +92,16 @@ npx cdk deploy FinalStackPart1 FinalStackPart2
 
 ### Testing the Endpoints
 
-After deployment, the API Gateway URLs will be printed in the console output. Use them to test your endpoints (e.g., with `curl` or PowerShell's `Invoke-RestMethod`):
+After deployment, the CDK outputs will include the necessary URLs.
 
 - **Part 1 Test (GET):** `[Part1-URL]/hello`
-- **Part 2 Test (POST):** `[Part2-URL]/items` with a JSON body
-- **Part 2 Test (GET):** `[Part2-URL]/items/{id}`
+- **Part 2 Test (API POST/GET):** `[Part2-API-BaseUrl]/items`
+- **Part 2 Test (Website):** Open the **`WebsiteUrl`** in your browser. You will need to manually copy the `ApiBaseUrl` from the deployment output and paste it into your local `website-assets/index.html` file before running the final deployment again to update the assets.
+
+```bash
+# After updating index.html locally with the API URL, redeploy assets:
+npx cdk deploy FinalStackPart2
+```
 
 ## 🗑️ Destroying Resources
 
@@ -101,4 +112,4 @@ When you are finished, you must destroy the stacks to avoid incurring AWS charge
 npx cdk destroy FinalStackPart1 FinalStackPart2
 ```
 
-> **Warning:** This command permanently deletes all resources (API Gateways, Lambdas, DynamoDB tables, etc.) within these stacks.
+> **Warning:** This command permanently deletes all resources (API Gateways, Lambdas, DynamoDB tables, S3 Buckets, etc.) within these stacks.
